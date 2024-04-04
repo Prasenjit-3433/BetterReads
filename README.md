@@ -27,6 +27,11 @@
 
 The application offers a user-friendly experience for browsing and tracking books. Here's a quick overview of the key functionalities:
 
+<!--  ![Screenshot](images/demo.gif) -->
+<p align="center">
+  <img src="diagrams/system-design.png" alt="animated" />
+</p>
+
 **Pages:**
 
 * **Book:** View book details (cover, title, description). Logged-in users can mark books as "Read," "Currently Reading," or "Not Read." Optionally, a rating system can be implemented.
