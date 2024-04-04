@@ -1,8 +1,8 @@
-# Better Reads: A Highly Scalable Book Tracking Application
+# 📰Better Reads: A Highly Scalable Book Tracking Application
 
 **Better Reads** is a full-stack application inspired by GoodReads, built with a focus on scalability and high performance.  The primary objective is to create an application that can handle and serve a vast catalog of every book ever published in the world, allowing users to browse, track their reading progress, and rate books efficiently, even with millions of data records.
 
-## Key Features
+## 💎Key Features
 
 * **Comprehensive Book Catalog**: Store and serve information on every book ever published globally.
 * **Book Tracking**: Users can mark books as read, currently reading, and rate them on a 5-star scale.
@@ -10,7 +10,7 @@
 * **Highly Scalable Architecture**: Designed to handle large amounts of data and scale seamlessly with increasing user load.
 * **High Performance**: Optimized for fast page loads and efficient data retrieval, ensuring a smooth user experience.
 
-## Tech Stack
+## 🛠️Tech Stack
 
 * **Backend**: Spring Boot
 * **Database**: Apache Cassandra (using DataStax Astra DB, a hosted Cassandra service)
@@ -23,7 +23,8 @@
 * **NoSQL Database (Apache Cassandra)**: Chosen for its ability to handle large amounts of data efficiently and scale horizontally.
 * **Hosted Cassandra Service (DataStax Astra DB)**: Provides a managed Cassandra instance, eliminating the need for local installation and scaling based on load.
 * **GitHub OAuth Integration**: Secure user authentication and authorization using GitHub OAuth.
-## User Experience (UX)
+  
+## 😍User Experience (UX)
 
 The application offers a user-friendly experience for browsing and tracking books. Here's a quick overview of the key functionalities:
 
@@ -47,7 +48,7 @@ The application offers a user-friendly experience for browsing and tracking book
 * Logged-in users can track their reading progress by marking books.
 * Clicking on an author's name leads to the Author Page showcasing all their books.
 
-## System Design
+## 🏗️System Design
 
 The Better Reads application leverages a robust and scalable system architecture to efficiently handle book data and user interactions. Here's a technical overview:
 
@@ -78,7 +79,7 @@ The Cassandra data model is optimized for the application's most frequent querie
 
 **Data Ingestion**
 
-A separate Spring Boot application ingests book metadata from the Open Library data dump into the Cassandra database.
+A separate Spring Boot service ingests book metadata from the Open Library data dump into the Cassandra database.
 
 **Scalability and Reliability**
 
