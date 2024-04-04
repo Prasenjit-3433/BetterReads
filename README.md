@@ -29,7 +29,7 @@ The application offers a user-friendly experience for browsing and tracking book
 
 <!--  ![Screenshot](images/demo.gif) -->
 <p align="center">
-  <img src="diagrams/ui.png" alt="animated" />
+  <img src="diagrams/pages-ui.png" alt="animated" />
 </p>
 
 **Pages:**
