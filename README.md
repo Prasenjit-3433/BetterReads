@@ -23,4 +23,22 @@
 * **NoSQL Database (Apache Cassandra)**: Chosen for its ability to handle large amounts of data efficiently and scale horizontally.
 * **Hosted Cassandra Service (DataStax Astra DB)**: Provides a managed Cassandra instance, eliminating the need for local installation and scaling based on load.
 * **GitHub OAuth Integration**: Secure user authentication and authorization using GitHub OAuth.
+## User Experience (UX)
+
+The application offers a user-friendly experience for browsing and tracking books. Here's a quick overview of the key functionalities:
+
+**Pages:**
+
+* **Book:** View book details (cover, title, description). Logged-in users can mark books as "Read," "Currently Reading," or "Not Read." Optionally, a rating system can be implemented.
+* **Author:** Lists all books written by a particular author in reverse chronological order (newest first). Accessible by clicking the author's name on the Book page.
+* **Search:** Enables searching for books by title.
+* **Login:** Uses OAuth (Github, Facebook) for user authentication (not required for basic search).
+* **Home (Logged Out):** Provides search functionality.
+* **Home (Logged In):** "My Books" section displays the user's recently read books (up to 50) in reverse chronological order, with the currently reading book at the top.
+
+**User Flows:**
+
+* Users can browse the app without logging in (search for books).
+* Logged-in users can track their reading progress by marking books.
+* Clicking on an author's name leads to the Author Page showcasing all their books.
 
