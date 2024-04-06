@@ -1,4 +1,4 @@
-# 📰Better Reads: A Highly Scalable Book Tracking Application
+# 📰Better Reads: A Highly Performant Book Tracking Application
 
 **Better Reads** is a full-stack application inspired by GoodReads, built with a focus on scalability and high performance.  The primary objective is to create an application that can handle and serve a vast catalog of every book ever published in the world, allowing users to browse, track their reading progress, and rate books efficiently, even with ***28+ millions*** of book records.
 
@@ -6,7 +6,7 @@
 
 * **Comprehensive Book Catalog**: Store and serve information on every book ever published globally.
 * **Book Tracking**: Users can mark books as read, currently reading, and rate them on a 5-star scale.
-* **Reading Progress Tracking**: Users can track their reading progress and view their recently read books.
+* **Reading Progress Tracking**: Users can track their reading progress and view their recently-read books.
 * **Highly Scalable Architecture**: Designed to handle large amounts of data and scale seamlessly with increasing user load.
 * **High Performance**: Optimized for fast page loads and efficient data retrieval, ensuring a smooth user experience.
 
