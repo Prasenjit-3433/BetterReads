@@ -1,6 +1,6 @@
 # 📰Better Reads: A Highly Scalable Book Tracking Application
 
-**Better Reads** is a full-stack application inspired by GoodReads, built with a focus on scalability and high performance.  The primary objective is to create an application that can handle and serve a vast catalog of every book ever published in the world, allowing users to browse, track their reading progress, and rate books efficiently, even with millions of data records.
+**Better Reads** is a full-stack application inspired by GoodReads, built with a focus on scalability and high performance.  The primary objective is to create an application that can handle and serve a vast catalog of every book ever published in the world, allowing users to browse, track their reading progress, and rate books efficiently, even with ***28+ millions*** of book records.
 
 ## 💎Key Features
 
@@ -90,6 +90,11 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 
 ## 📐Data Modeling and Schema Design
 
+  <!--  ![Screenshot](images/demo.gif) -->
+  <p align="center">
+    <img src="diagrams/entity.png" alt="system design" />
+  </p>
+
 **Cassandra vs Relational Databases:**
 * Data Distribution: Cassandra distributes data across nodes based on a partition key. Relational databases typically store all data in a single location.
 * Schema Design: Cassandra tables are designed for specific queries, often denormalizing data to avoid joins at read time. Relational databases focus on data integrity and normalization.
@@ -98,34 +103,35 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 - **Partition Key:** A column or set of columns that determines which node stores a piece of data.
 - **Clustering Key:** An optional column or set of columns that defines the order of rows within a partition.
 
-1. **Introduction**
-
-   This document outlines the system design for a book management system using Cassandra, a NoSQL database. The system will store information about books, authors, user ratings, and reading progress.
-
-2. **Requirements**
+1. **Requirements**
    - Store book information (title, author, publication date, etc.)
    - Efficiently retrieve books by author ID, sorted by recent publication date.
    - Allow users to rate and track the status (currently reading, finished) of books.
    - Display a user's recently read books, sorted by status (currently reading first) and then by read time (most recent first).
 
-3. **Data Model**
+2. **Data Model**
 
    We will leverage Cassandra's strengths in data distribution and denormalization to achieve optimal performance for the defined queries.
+
+    <!--  ![Screenshot](images/demo.gif) -->
+    <p align="center">
+      <img src="diagrams/queries.png" alt="system design" />
+    </p>
 
    3.1 **Tables**
 
    The system will utilize four Cassandra tables:
 
-   - **Books by ID** (Primary Key: book_id):
+   - **Books by ID** (Partition Key: book_id):
      - Stores detailed information about each book (title, author, publication date, etc.).
-   - **Books by Author ID** (Primary Key: author_id, Clustering Key: publish_date descending):
+   - **Books by Author ID** (Partition Key: author_id, Clustering Key: publish_date descending):
      - Stores book IDs for each author.
      - Uses author_id as the partition key to efficiently retrieve all books by an author.
      - Uses publish_date as a clustering key in descending order to display books with the most recent publication date first.
-   - **User Book by Book ID and User ID** (Primary Key: book_id, user_id):
+   - **User Book by Book ID and User ID** (Partition: book_id, user_id):
      - Stores user-specific data for a book (rating, status - currently reading/finished).
      - Uses book_id and user_id as the composite primary key for quick access to user information for a particular book.
-   - **User Books by User ID** (Primary Key: user_id, Clustering Key: time_uuid descending, status ascending):
+   - **User Books by User ID** (Partition Key: user_id, Clustering Key: time_uuid descending, status ascending):
      - Stores all book IDs read by a user.
      - Uses user_id as the partition key to efficiently retrieve all books read by a user.
      - Uses a combination of clustering keys:
@@ -136,19 +142,19 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 
    We intentionally duplicate some data (author information in Books by Author ID table) to avoid joins during read operations and improve performance.
 
-4. **Partitioning Strategy**
+3. **Partitioning Strategy**
+   
+      <!--  ![Screenshot](images/demo.gif) -->
+    <p align="center">
+      <img src="diagrams/chebotko.png" alt="system design" />
+    </p>
 
    - **Books by ID:** Partitioned by book_id to ensure each book has a single location for efficient retrieval.
    - **Books by Author ID:** Partitioned by author_id to group all books by an author for efficient retrieval. Potential for large partitions if an author has many books, but considered acceptable based on the assumption of a limited number of books per author.
    - **User Book by Book ID and User ID:** Partitioned by both book_id and user_id for quick access to user-specific information for a book.
    - **User Books by User ID:** Partitioned by user_id to efficiently retrieve all books read by a user. We acknowledge the possibility of large partitions for users with extensive reading history. We will monitor partition size and implement solutions like year-based sub-partitions if necessary.
 
-5. **Trade-offs**
+4. **Trade-offs**
 
    The chosen schema design prioritizes read performance for the specified queries by denormalizing data and leveraging Cassandra's partitioning capabilities. This approach comes at the expense of some data duplication.
-
-6. **Future Considerations**
-
-   - Monitor partition sizes, especially for User Books by User ID. Implement sub-partitioning by year if necessary.
-   - Explore caching mechanisms for frequently accessed data to further improve performance.
 
