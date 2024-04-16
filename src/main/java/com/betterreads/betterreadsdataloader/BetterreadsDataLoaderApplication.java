@@ -1,6 +1,6 @@
 package com.betterreads.betterreadsdataloader;
 
-import connection.DataStaxAstraProperties;
+import com.betterreads.betterreadsdataloader.connection.DataStaxAstraProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer;
@@ -17,10 +17,6 @@ public class BetterreadsDataLoaderApplication {
 		SpringApplication.run(BetterreadsDataLoaderApplication.class, args);
 	}
 
-	/**
-	 * This is necessary to have the Spring Boot app use the Astra secure bundle
-	 * to connect to the database
-	 */
 	@Bean
 	public CqlSessionBuilderCustomizer sessionBuilderCustomizer(DataStaxAstraProperties astraProperties) {
 		Path bundle = astraProperties.getSecureConnectBundle().toPath();
