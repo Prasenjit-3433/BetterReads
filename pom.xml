@@ -34,23 +34,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Cassandra driver -->
-		<dependency>
-			<groupId>com.datastax.oss</groupId>
-			<artifactId>java-driver-core</artifactId>
-			<version>4.13.0</version>
-			<!-- exclude Tinkerpop dependencies to remove groovy warning on Java 11 -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.tinkerpop</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.datastax.oss</groupId>
-			<artifactId>native-protocol</artifactId>
-		</dependency>
+
 	</dependencies>
 
 	<build>
