@@ -68,7 +68,35 @@ public class BetterreadsDataLoaderApplication {
 		}
 	}
 
-	private void initWorks() {}
+	private void initWorks() {
+		Path path = Paths.get(worksDumpLocation);
+
+		try(Stream<String> lines = Files.lines(path)) {
+			lines.forEach(line -> {
+				// Read & parse the line
+				String jsonString = line.substring(line.indexOf("{"));
+
+				try {
+					JSONObject jsonObject = new JSONObject(jsonString);
+
+					// Construct an Book object
+					Author author = new Author();
+					author.setName(jsonObject.optString("name"));
+					author.setPersonalName(jsonObject.optString("personal_name"));
+					author.setId(jsonObject.optString("key").replace("/authors/", ""));
+
+					// Persist using Repository
+					System.out.println("Saving author: " + author.getName() + "...");
+					authorRepository.save(author);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+			});
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 	@PostConstruct
