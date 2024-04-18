@@ -1,3 +1,7 @@
+datadump.location:
+    author: ../dumps/ol_dump_authors_2024-03-31.txt
+    works: ../dumps/ol_dump_works_2024-03-31.txt
+
 spring:
     data:
         cassandra:
