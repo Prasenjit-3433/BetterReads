@@ -36,9 +36,9 @@ public class Book {
     @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
     private List<String> authorNames;
 
-    @Column("author_id")
+    @Column("author_ids")
     @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
-    private List<String> authorId;
+    private List<String> authorIds;
 
     public String getId() {
         return id;
@@ -88,11 +88,11 @@ public class Book {
         this.authorNames = authorNames;
     }
 
-    public List<String> getAuthorId() {
-        return authorId;
+    public List<String> getAuthorIds() {
+        return authorIds;
     }
 
-    public void setAuthorId(List<String> authorId) {
-        this.authorId = authorId;
+    public void setAuthorIds(List<String> authorIds) {
+        this.authorIds = authorIds;
     }
 }
