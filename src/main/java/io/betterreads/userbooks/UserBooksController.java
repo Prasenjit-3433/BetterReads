@@ -37,7 +37,7 @@ public class UserBooksController {
         userBooks.setStartedDate(LocalDate.parse(formData.getFirst("startDate")));
         userBooks.setCompletedDate(LocalDate.parse(formData.getFirst("completedDate")));
         userBooks.setRating(Integer.parseInt(formData.getFirst("rating")));
-        userBooks.setReadingStatus(formData.getFirst("status"));
+        userBooks.setReadingStatus(formData.getFirst("readingStatus"));
 
         userBooksRepository.save(userBooks);
 

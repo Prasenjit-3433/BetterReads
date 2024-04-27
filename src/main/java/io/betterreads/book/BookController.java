@@ -1,5 +1,8 @@
 package io.betterreads.book;
 
+import io.betterreads.userbooks.UserBooks;
+import io.betterreads.userbooks.UserBooksPrimaryKey;
+import io.betterreads.userbooks.UserBooksRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,8 +21,14 @@ public class BookController {
     @Autowired
     BookRepository bookRepository;
 
+    @Autowired
+    UserBooksRepository userBooksRepository;
+
     @GetMapping(value = "/books/{bookId}")
-    public String getBook(@PathVariable String bookId, Model model, @AuthenticationPrincipal OAuth2User principal) {
+    public String getBook(
+            @PathVariable String bookId,
+            Model model, @AuthenticationPrincipal OAuth2User principal
+    ) {
         Optional<Book> optionalBook =  bookRepository.findById(bookId);
         if (optionalBook.isPresent()) {
             Book book = optionalBook.get();
@@ -32,7 +41,19 @@ public class BookController {
             model.addAttribute("book", book);
 
             if(principal != null && principal.getAttribute("login") != null) {
-                model.addAttribute("login", principal.getAttribute("login"));
+                String userId = principal.getAttribute("login");
+                model.addAttribute("login", userId);
+
+                UserBooksPrimaryKey key = new UserBooksPrimaryKey();
+                key.setBookId(bookId);
+                key.setUserId(userId);
+
+                Optional<UserBooks> optionalUserBooks = userBooksRepository.findById(key);
+                if (optionalUserBooks.isPresent()) {
+                    model.addAttribute("userBooks", optionalUserBooks.get());
+                } else {
+                    model.addAttribute("userBooks", new UserBooks());
+                }
             }
 
             return "book";
