@@ -133,7 +133,7 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 
    The chosen schema design prioritizes read performance for the specified queries by denormalizing data and leveraging Cassandra's partitioning capabilities. This approach comes at the expense of some data duplication.
 
-## 🏗️System Design
+## 🏗️System Design: Scalability and Performance at the Core
 
 The Better Reads application leverages a robust and scalable system architecture to efficiently handle book data and user interactions. Here's a technical overview:
 
@@ -144,16 +144,27 @@ The Better Reads application leverages a robust and scalable system architecture
 
 **Architecture**
 
-The system follows a three-tier architecture:
+**1. Presentation Tier:**
 
-1. **Presentation Tier:** Spring Boot web application with Spring MVC, Thymeleaf for templating. Handles user interactions, rendering views, and data communication.
-2. **Application Tier:** Stateless Spring Boot application with Spring Security. Handles business logic and coordinates data flow.
-3. **Data Tier:** Apache Cassandra database cluster (NoSQL) for scalable and reliable data storage.
+* Spring Boot web application with Spring MVC for efficient request handling and routing.
+* Thymeleaf templating engine for dynamic and user-friendly interfaces.
+* Focus: User interactions, view rendering, and data presentation.
 
-**Key Decisions**
+**2. Application Tier:**
 
-* **NoSQL Database (Cassandra):** Efficiently handles large data volumes, scales horizontally, and offers high availability.
-* **Hosted Cassandra Service:** Leverages a managed service (DataStax Astra DB) for automatic scaling and reduced maintenance.
-* **Spring Data Cassandra:** Provides seamless data interaction using a repository-based pattern.
-* **GitHub OAuth Integration:** Secure user authentication and authorization via Spring Security.
-* **Open Library API (Search Only):** Integrates for search functionality; other data operations use Cassandra.
+* Stateless Spring Boot application with Spring Security for robust authentication and authorization.
+* Handles business logic, coordinates data flow between presentation and data tiers.
+
+**3. Data Tier:**
+
+* Apache Cassandra database cluster (NoSQL) for horizontally scalable and fault-tolerant data storage.
+* DataStax Astra DB: Managed Cassandra service ensures automatic scaling and simplifies maintenance.
+* Spring Data Cassandra: Streamlines data interaction with the Cassandra database using a repository pattern.
+
+**Key Design Decisions for Scalability and Performance:**
+
+* **NoSQL Database (Cassandra):** Efficiently handles massive datasets (28+ millions of books) and scales horizontally to accommodate increasing user load.
+* **Data Modeling and Partitioning:** Optimized Cassandra schema design minimizes read operations and data retrieval times.
+* **Stateless Application Tier:** Enables horizontal scaling by allowing stateless application servers to be easily added or removed based on traffic demands.
+
+This system design ensures **Better Reads** can effectively manage a vast book catalog, deliver fast page loads, and maintain a smooth user experience even with a large and growing user base.
