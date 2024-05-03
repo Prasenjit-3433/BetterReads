@@ -48,8 +48,6 @@ public class BooksByUser {
     @CassandraType(type = Name.LIST, typeArguments = Name.TEXT)
     private List<String> coverIds;
 
-
-
     @Column("rating")
     @CassandraType(type = Name.INT)
     private int rating;

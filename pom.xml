@@ -8,11 +8,11 @@
 		<version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>io.javabrains</groupId>
-	<artifactId>github-auth-template</artifactId>
+	<groupId>io.betterreads</groupId>
+	<artifactId>betterreads</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>github-auth-template</name>
-	<description>Demo project for Spring Boot</description>
+	<name>betterreads</name>
+	<description>A clone of GoodReads!</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
