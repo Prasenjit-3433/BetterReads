@@ -139,7 +139,7 @@ The Better Reads application leverages a robust and scalable system architecture
 
 <!--  ![Screenshot](images/demo.gif) -->
 <p align="center">
-  <img src="diagrams/system-design-v2.png" alt="system design" />
+  <img src="diagrams/system-design-v3.png" alt="system design" />
 </p>
 
 **Architecture**
