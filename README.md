@@ -48,31 +48,6 @@ The application offers a user-friendly experience for browsing and tracking book
 * Logged-in users can track their reading progress by marking books.
 * Clicking on an author's name leads to the Author Page showcasing all their books.
 
-## 🏗️System Design
-
-The Better Reads application leverages a robust and scalable system architecture to efficiently handle book data and user interactions. Here's a technical overview:
-
-<!--  ![Screenshot](images/demo.gif) -->
-<p align="center">
-  <img src="diagrams/system-design-v2.png" alt="system design" />
-</p>
-
-**Architecture**
-
-The system follows a three-tier architecture:
-
-1. **Presentation Tier:** Spring Boot web application with Spring MVC, Thymeleaf for templating. Handles user interactions, rendering views, and data communication.
-2. **Application Tier:** Stateless Spring Boot application with Spring Security. Handles business logic and coordinates data flow.
-3. **Data Tier:** Apache Cassandra database cluster (NoSQL) for scalable and reliable data storage.
-
-**Key Decisions**
-
-* **NoSQL Database (Cassandra):** Efficiently handles large data volumes, scales horizontally, and offers high availability.
-* **Hosted Cassandra Service:** Leverages a managed service (DataStax Astra DB) for automatic scaling and reduced maintenance.
-* **Spring Data Cassandra:** Provides seamless data interaction using a repository-based pattern.
-* **GitHub OAuth Integration:** Secure user authentication and authorization via Spring Security.
-* **Open Library API (Search Only):** Integrates for search functionality; other data operations use Cassandra.
-
 **Data Modeling and Query-Driven Design**
 
 The Cassandra data model is optimized for the application's most frequent queries, ensuring efficient data retrieval.
@@ -158,3 +133,27 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 
    The chosen schema design prioritizes read performance for the specified queries by denormalizing data and leveraging Cassandra's partitioning capabilities. This approach comes at the expense of some data duplication.
 
+## 🏗️System Design
+
+The Better Reads application leverages a robust and scalable system architecture to efficiently handle book data and user interactions. Here's a technical overview:
+
+<!--  ![Screenshot](images/demo.gif) -->
+<p align="center">
+  <img src="diagrams/system-design-v2.png" alt="system design" />
+</p>
+
+**Architecture**
+
+The system follows a three-tier architecture:
+
+1. **Presentation Tier:** Spring Boot web application with Spring MVC, Thymeleaf for templating. Handles user interactions, rendering views, and data communication.
+2. **Application Tier:** Stateless Spring Boot application with Spring Security. Handles business logic and coordinates data flow.
+3. **Data Tier:** Apache Cassandra database cluster (NoSQL) for scalable and reliable data storage.
+
+**Key Decisions**
+
+* **NoSQL Database (Cassandra):** Efficiently handles large data volumes, scales horizontally, and offers high availability.
+* **Hosted Cassandra Service:** Leverages a managed service (DataStax Astra DB) for automatic scaling and reduced maintenance.
+* **Spring Data Cassandra:** Provides seamless data interaction using a repository-based pattern.
+* **GitHub OAuth Integration:** Secure user authentication and authorization via Spring Security.
+* **Open Library API (Search Only):** Integrates for search functionality; other data operations use Cassandra.
