@@ -195,13 +195,8 @@ This architecture lays the foundation for a high-performing, scalable, and relia
 
 **Scaling Strategies:**
 
-- **Horizontal Scaling:** Scale out the database and application services by adding more nodes to handle increased load.
-- **Sharding:** Distribute data across multiple clusters to manage large datasets effectively.
-
-**Caching and Load Balancing:**
-
-- **In-Memory Caching:** Use a caching layer (e.g., Redis or Memcached) to store frequently accessed data, reducing the load on the database.
-- **Load Balancing:** Deploy a load balancer (e.g., AWS Elastic Load Balancer) to distribute incoming requests evenly across multiple service instances.
+- **Horizontal Scaling:** Scale out the database and application services by adding more nodes to handle increased load, which is gonna be managed by AWS Elastic Beanstalk.
+- **Sharding:** Distribute data across multiple clusters to manage large datasets effectively, , which is gonna be managed by DataStack AstraDB managed cluster effectively.
 
 
 ## 🚀 CI/CD Pipeline
