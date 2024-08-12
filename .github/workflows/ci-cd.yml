@@ -1,0 +1,29 @@
+name: BetterReads
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build Project
+        run: mavn clean install -DskipTests
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: 'BetterReads'
+          environment_name: 'BetterReads-env'
+          version_label: ${{ github.sha }}
+          region: ap-south-1
+          deployment_package: target/betterreads-0.0.1-SNAPSHOT.jar

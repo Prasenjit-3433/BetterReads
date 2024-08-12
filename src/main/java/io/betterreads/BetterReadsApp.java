@@ -19,6 +19,7 @@ public class BetterReadsApp {
 		SpringApplication.run(BetterReadsApp.class, args);
 	}
 
+
 //	@RequestMapping("/user")
 //	public String user(@AuthenticationPrincipal OAuth2User principal) {
 //		System.out.println(principal);
