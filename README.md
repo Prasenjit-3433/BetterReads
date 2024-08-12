@@ -16,11 +16,11 @@
 * **Database**: Apache Cassandra (using DataStax Astra DB, a hosted Cassandra service)
 * **Security**: Spring Security with GitHub OAuth login
 * **View Rendering**: Thymeleaf
-* **Data Access**: Spring Data Cassandra (repository pattern)
+* **Data Access**: Spring Data Cassandra (Repository Pattern)
 
 ## Architecture Highlights
 
-* **NoSQL Database (Apache Cassandra)**: Chosen for its ability to handle large amounts of data efficiently and scale horizontally.
+* **NoSQL Database (Apache Cassandra)**:Chosen for its ability to handle large amounts of data efficiently and scale horizontally.
 * **Hosted Cassandra Service (DataStax Astra DB)**: Provides a managed Cassandra instance, eliminating the need for local installation and scaling based on load.
 * **GitHub OAuth Integration**: Secure user authentication and authorization using GitHub OAuth.
   
@@ -45,126 +45,185 @@ The application offers a user-friendly experience for browsing and tracking book
 **User Flows:**
 
 * Users can browse the app without logging in (search for books).
-* Logged-in users can track their reading progress by marking books.
+* Only Logged-in users can track their reading progress by marking books.
 * Clicking on an author's name leads to the Author Page showcasing all their books.
-
-**Data Modeling and Query-Driven Design**
-
-The Cassandra data model is optimized for the application's most frequent queries, ensuring efficient data retrieval.
-
-**Data Ingestion**
-
-A separate Spring Boot service ingests book metadata from the Open Library data dump into the Cassandra database.
-
-**Scalability and Reliability**
-
-* The stateless application tier scales horizontally for high availability.
-* The Cassandra cluster offers built-in replication and fault tolerance for data durability.
 
 This architecture lays the foundation for a high-performing, scalable, and reliable application to manage a vast book collection.
 
-## 📐Data Modeling and Schema Design
+## 📐 Data Modeling and Schema Design
 
-  <!--  ![Screenshot](images/demo.gif) -->
+### 1. Understanding the Requirements
+
   <p align="center">
     <img src="diagrams/entity.png" alt="system design" />
   </p>
 
-**Cassandra vs Relational Databases:**
-* Data Distribution: Cassandra distributes data across nodes based on a partition key. Relational databases typically store all data in a single location.
-* Schema Design: Cassandra tables are designed for specific queries, often denormalizing data to avoid joins at read time. Relational databases focus on data integrity and normalization.
+**Core Data Entities:**
+- **Books:** Represents individual books with details such as title, author, publication date, etc.
+- **Authors:** Represents authors and their associated books.
+- **Users:** Represents users who interact with the system, tracking their reading status and ratings.
 
-**Key Concepts in Cassandra**
-- **Partition Key:** A column or set of columns that determines which node stores a piece of data.
-- **Clustering Key:** An optional column or set of columns that defines the order of rows within a partition.
+**Key Functional Requirements:**
+- Efficient retrieval of book details by book ID.
+- Retrieval of all books by a specific author, sorted by publication date.
+- User-specific operations, such as tracking reading progress and rating books.
+- Display of a user's recently read books, with the ability to prioritize those currently being read.
 
-1. **Requirements**
-   - Store book information (title, author, publication date, etc.)
-   - Efficiently retrieve books by author ID, sorted by recent publication date.
-   - Allow users to rate and track the status (currently reading, finished) of books.
-   - Display a user's recently read books, sorted by status (currently reading first) and then by read time (most recent first).
+**Non-Functional Requirements:**
+- **Scalability:** Must handle a dataset with 28+ million books and a growing user base.
+- **Performance:** Fast retrieval times for queries, especially those involving large datasets.
+- **Consistency:** Maintain data consistency, particularly in user-related operations.
 
-2. **Data Model**
+### 2. Data Modeling Strategy
 
-   We will leverage Cassandra's strengths in data distribution and denormalization to achieve optimal performance for the defined queries.
-
-    <!--  ![Screenshot](images/demo.gif) -->
-    <p align="center">
+<p align="center">
       <img src="diagrams/queries.png" alt="system design" />
-    </p>
+</p>
 
-   3.1 **Tables**
+**Design Considerations:**
+- **Query-Driven Schema Design:** Schema design in Cassandra should be driven by the application's query patterns, focusing on read efficiency.
+- **Denormalization:** Data denormalization is used to avoid complex joins, enhancing read performance at the cost of additional storage.
 
-   The system will utilize four Cassandra tables:
+### 3. Schema Design and Table Definitions
 
-   - **Books by ID** (Partition Key: book_id):
-     - Stores detailed information about each book (title, author, publication date, etc.).
-   - **Books by Author ID** (Partition Key: author_id, Clustering Key: publish_date descending):
-     - Stores book IDs for each author.
-     - Uses author_id as the partition key to efficiently retrieve all books by an author.
-     - Uses publish_date as a clustering key in descending order to display books with the most recent publication date first.
-   - **User Book by Book ID and User ID** (Partition: book_id, user_id):
-     - Stores user-specific data for a book (rating, status - currently reading/finished).
-     - Uses book_id and user_id as the composite primary key for quick access to user information for a particular book.
-   - **User Books by User ID** (Partition Key: user_id, Clustering Key: time_uuid descending, status ascending):
-     - Stores all book IDs read by a user.
-     - Uses user_id as the partition key to efficiently retrieve all books read by a user.
-     - Uses a combination of clustering keys:
-       - time_uuid (in descending order) for recent reads.
-       - status (ascending order) to prioritize "currently reading" books even if they were started before finished books.
-
-   3.2 **Denormalization**
-
-   We intentionally duplicate some data (author information in Books by Author ID table) to avoid joins during read operations and improve performance.
-
-3. **Partitioning Strategy**
-   
-      <!--  ![Screenshot](images/demo.gif) -->
-    <p align="center">
+<p align="center">
       <img src="diagrams/chebotko.png" alt="system design" />
-    </p>
+</p>
 
-   - **Books by ID:** Partitioned by book_id to ensure each book has a single location for efficient retrieval.
-   - **Books by Author ID:** Partitioned by author_id to group all books by an author for efficient retrieval. Potential for large partitions if an author has many books, but considered acceptable based on the assumption of a limited number of books per author.
-   - **User Book by Book ID and User ID:** Partitioned by both book_id and user_id for quick access to user-specific information for a book.
-   - **User Books by User ID:** Partitioned by user_id to efficiently retrieve all books read by a user. We acknowledge the possibility of large partitions for users with extensive reading history. We will monitor partition size and implement solutions like year-based sub-partitions if necessary.
+**1. Books by ID**
+- **Purpose:** Store detailed information about each book, enabling quick retrieval by book ID.
+- **Table Structure:**
+    - **Partition Key:** `book_id` (ensures all details of a specific book are stored together).
+    - **Columns:** `title`, `author_id`, `publication_date`, `genre`, `summary`, etc.
+- **Usage:** Supports fast lookups by book ID, ideal for retrieving book details in response to user queries.
 
-4. **Trade-offs**
+**2. Books by Author ID**
+- **Purpose:** Retrieve all books by a specific author, sorted by publication date.
+- **Table Structure:**
+    - **Partition Key:** `author_id` (groups all books by the same author).
+    - **Clustering Key:** `publish_date DESC` (orders books by the most recent publication date).
+    - **Columns:** `book_id`, `title`, `genre`, etc.
+- **Usage:** Optimized for browsing books by an author and listing them in chronological order.
 
-   The chosen schema design prioritizes read performance for the specified queries by denormalizing data and leveraging Cassandra's partitioning capabilities. This approach comes at the expense of some data duplication.
+**3. User Book by Book ID and User ID**
+- **Purpose:** Store user-specific data for a particular book, including reading status and ratings.
+- **Table Structure:**
+    - **Composite Partition Key:** `book_id`, `user_id` (enables efficient retrieval of a user’s data for a specific book).
+    - **Columns:** `rating`, `status` (currently reading, finished), `last_updated`.
+- **Usage:** Facilitates tracking of reading status and user-specific book information.
 
-## 🏗️System Design: Scalability and Performance at the Core
+**4. User Books by User ID**
+- **Purpose:** Retrieve all books a user has interacted with, prioritizing those currently being read and recently finished.
+- **Table Structure:**
+    - **Partition Key:** `user_id` (groups all books associated with a user).
+    - **Clustering Keys:** `status ASC`, `time_uuid DESC` (prioritizes currently reading books and orders by recent interactions).
+    - **Columns:** `book_id`, `title`, `author_id`, `rating`.
+- **Usage:** Supports user-centric views, like displaying recently read books with currently reading items at the top.
 
-The Better Reads application leverages a robust and scalable system architecture to efficiently handle book data and user interactions. Here's a technical overview:
+### 4. Partition Strategy and Trade-offs
 
-<!--  ![Screenshot](images/demo.gif) -->
+**Partitioning Strategy:**
+- **Balanced Partitioning:** Ensures data is evenly distributed across the cluster to avoid hotspots. Using author IDs and user IDs as partition keys helps distribute load based on these high-cardinality fields.
+- **Handling Large Partitions:** For partitions that could grow large (e.g., popular authors or users with extensive reading history), monitoring and potential sub-partitioning strategies (e.g., year-based sub-partitions) may be required.
+
+**Trade-offs:**
+- **Denormalization vs. Storage Efficiency:** The schema prioritizes read performance by duplicating data across tables, which trades off storage efficiency.
+- **Eventual Consistency:** Due to Cassandra's distributed nature, some operations might exhibit eventual consistency. This is managed by careful schema design and tuning of consistency levels.
+
+## 🏗️ System Design: Scalability and Performance at the Core:
+
 <p align="center">
   <img src="diagrams/system-design-v3.png" alt="system design" />
 </p>
 
-**Architecture**
+### 1. Understand the Problem
 
-**1. Presentation Tier:**
+**Clarify Requirements:**
+- **Core Functionality:** *Better Reads* is a book tracking application that allows users to browse, track their reading progress, and rate books. The system must handle large datasets, including every book ever published, and serve this data efficiently to a potentially large user base.
+- **Users:** The primary users are avid readers who want to manage their reading history, discover new books, and connect with other readers. The system should accommodate both casual users (browsing and rating) and power users (extensive reading history tracking).
+- **Performance and Scalability Requirements:** The system must support millions of books and handle a growing user base without degradation in performance. It should deliver fast response times, even under high load.
+- **Constraints and Limitations:** The application should maintain high availability and fault tolerance. It must support horizontal scaling to manage increasing data volume and user traffic.
 
-* Spring Boot web application with Spring MVC for efficient request handling and routing.
-* Thymeleaf templating engine for dynamic and user-friendly interfaces.
-* Focus: User interactions, view rendering, and data presentation.
+**Define Functional and Non-Functional Requirements:**
 
-**2. Application Tier:**
+- **Functional Requirements:**
+    - Allow users to search and browse books.
+    - Track user reading status (e.g., Currently Reading, Finished).
+    - Provide user ratings and display recently read books.
 
-* Stateless Spring Boot application with Spring Security for robust authentication and authorization.
-* Handles business logic, coordinates data flow between presentation and data tiers.
+- **Non-Functional Requirements:**
+    - **Performance:** Fast search and retrieval of book data, with sub-second response times.
+    - **Scalability:** Support for a growing dataset (28+ million book records) and user base.
+    - **Availability:** The system should be highly available, with minimal downtime.
+    - **Consistency:** Ensure data consistency, particularly in user reading status and ratings.
+    - **Security:** Secure user authentication and data protection.
 
-**3. Data Tier:**
+### 2. Deep Dive into Components
 
-* Apache Cassandra database cluster (NoSQL) for horizontally scalable and fault-tolerant data storage.
-* DataStax Astra DB: Managed Cassandra service ensures automatic scaling and simplifies maintenance.
-* Spring Data Cassandra: Streamlines data interaction with the Cassandra database using a repository pattern.
+**Choose Data Structures and Algorithms:**
 
-**Key Design Decisions for Scalability and Performance:**
+- **Cassandra for Book Data:**
+    - **Partition Key:** `book_id` for retrieving specific book details.
+    - **Clustering Key:** `publish_date` for ordering books by recent publication in queries.
+- **Spring Boot for Application Logic:**
+    - Manages REST API endpoints, business logic, and integrates with Cassandra using Spring Data Cassandra.
+- **GitHub OAuth for Authentication:**
+    - Ensures secure login and user data protection.
 
-* **NoSQL Database (Cassandra):** Efficiently handles massive datasets (28+ millions of books) and scales horizontally to accommodate increasing user load.
-* **Data Modeling and Partitioning:** Optimized Cassandra schema design minimizes read operations and data retrieval times.
-* **Stateless Application Tier:** Enables horizontal scaling by allowing stateless application servers to be easily added or removed based on traffic demands.
+**Consider Trade-offs:**
 
-This system design ensures **Better Reads** can effectively manage a vast book catalog, deliver fast page loads, and maintain a smooth user experience even with a large and growing user base.
+- **Data Denormalization:** Improves read performance by avoiding costly joins, at the expense of data duplication.
+- **Eventual Consistency:** In exchange for high availability, some operations may exhibit eventual consistency due to the distributed nature of Cassandra.
+
+**Estimate System Capacity:**
+
+- **Data Volume:** Handle 28+ million book records, with an expected growth rate aligned with new book publications.
+- **Traffic Estimation:** Assume peak traffic could reach millions of read/write requests per minute during high-activity periods (e.g., after the release of popular book lists).
+
+**Handle Failures:**
+
+- **Fault Tolerance:** Utilize Cassandra’s built-in replication for data durability and fault tolerance.
+- **Stateless Services:** Design the application tier to be stateless, allowing easy recovery and load redistribution in case of server failures.
+
+### 3. Identify Bottlenecks and Scale
+
+**Analyze Performance:**
+
+- **Read-Heavy Operations:** Focus on optimizing read operations, such as fetching book details and displaying user reading history, as these are the most frequent.
+- **Potential Bottlenecks:**
+    - **Database Reads:** If a single partition key (e.g., `author_id`) becomes too large, it may slow down queries. Mitigate this by ensuring balanced partitioning and considering secondary indexes or sub-partitioning strategies.
+
+**Scaling Strategies:**
+
+- **Horizontal Scaling:** Scale out the database and application services by adding more nodes to handle increased load.
+- **Sharding:** Distribute data across multiple clusters to manage large datasets effectively.
+
+**Caching and Load Balancing:**
+
+- **In-Memory Caching:** Use a caching layer (e.g., Redis or Memcached) to store frequently accessed data, reducing the load on the database.
+- **Load Balancing:** Deploy a load balancer (e.g., AWS Elastic Load Balancer) to distribute incoming requests evenly across multiple service instances.
+
+
+## 🚀 CI/CD Pipeline
+
+To ensure smooth and automated deployment of the *Better Reads* application, I have implemented a robust CI/CD pipeline using **GitHub Actions**, **Maven**, **AWS S3**, and **AWS Elastic Beanstalk**. This pipeline automates the entire build, test, and deployment process, allowing for continuous integration and continuous delivery of updates to the application.
+
+<p align="center">
+  <img src="diagrams/CI-CD.gif" alt="CI/CD Pipeline" />
+</p>
+
+### Key Components:
+
+- **GitHub Actions**: Automated workflows are triggered on each commit to the repository. These workflows handle the build, test, and deployment processes.
+- **Maven**: The project is built using Maven, which handles dependencies and ensures that the application is compiled and packaged correctly before deployment.
+- **AWS S3**: The packaged application artifacts are stored in an S3 bucket, providing a reliable and scalable storage solution.
+- **AWS Elastic Beanstalk**: The application is deployed to AWS Elastic Beanstalk, which manages the environment and handles scaling, load balancing, and monitoring.
+
+### Pipeline Workflow:
+
+1. **Code Commit**: When changes are pushed to the repository, GitHub Actions triggers the CI/CD pipeline.
+2. **Build and Test**: Maven compiles the code, runs unit tests, and packages the application. If the build and tests are successful, the pipeline proceeds to the deployment stage.
+3. **Build Output Storage**: The build output (aka .jar file) is uploaded to AWS S3, ensuring that it is safely stored and accessible for deployment.
+4. **Deployment**: AWS Elastic Beanstalk automatically deploys the latest version of the application from S3 to the production environment. The environment is continuously monitored, and any issues are automatically managed by Elastic Beanstalk.
+
+This CI/CD pipeline streamlines the development process, allowing for faster iterations and ensuring that the *Better Reads* application is always up-to-date and running smoothly.
